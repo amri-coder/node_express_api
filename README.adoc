@@ -1,0 +1,20 @@
+Se connecter a l'utilisateur postgres sur le system nix +
+sudo -i -u postgres +
+ +
+Créer un utilisateur de base de données +
+dans psql +
+CREATE USER dev; +
+ +
+Attribuer un password à l'utilisateur dev +
+dans psql +
+alter user dev with encrypted password 'dev'; +
+ +
+Créer la base de données sur postgresql +
+hors psql , dev est l'utilisateur de la base de données +
+et devdb le nom de la base de données +
+createdb -O dev -E UTF8 devdb; +
+dans psql +
+GRANT CONNECT ON DATABASE devdb TO dev; +
+GRANT USAGE ON SCHEMA public TO dev; +
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO dev; +
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO dev;
