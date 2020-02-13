@@ -1,7 +1,7 @@
 const express = require("express");
-const _ = require("lodash");
 const router = express.Router();
 const promosController = require("../controllers/promos.controller");
+const validators = require('../validators/promos');
 
 router.get("/", async (request, response) => {
   const data = await promosController.getAllPromo();
@@ -16,47 +16,14 @@ router.get("/:id", async (request, response) => {
 
 router.post("/ajouter", async (request, response) => {
   const { titre, iteration } = request.body;
-  //validation des données
-if(_.isNil(titre)){
-  response.status(400)
-    .json({error:'le titre doit etre renseigné'});
-}
 
-if(typeof titre !== 'string'){
-  response.status(400)
-    .json({error:'le titre doit etre une chaine de caracteres'});
-}
+  validators.titre(titre, response);
+  validators.iteration(iteration, response);
 
-if(titre.length>30){
-  response.status(400)
-    .json({error:'le titre doit etre inferieure à 30 caracteres'});
-}
+  const nouvellePromo = await promosController
+    .addPromo({ titre, iteration });
 
- if(_.isNil(iteration)){
-  response.status(400)
-  .json({error:'l\'itération doit etre renseigné'});
- }
-
- if(typeof iteration !== 'number'){
-  response.status(400)
-    .json({error:'l\'itération doit etre un nombre'});
-}
-
-
-if(!Number.isInteger(iteration)){
-  response.status(400)
-    .json({error:'l\'itération doit etre un nombre entier'});
-}
-
-if(iteration<=0){
-  response.status(400)
-    .json({error:'l\'itération doit etre un nombre positif'});
-}
-
-const nouvellePromo = await promosController
-        .addPromo({ titre, iteration });
-
-response.status(201).json({
+  response.status(201).json({
     data: {
       titre: nouvellePromo.titre,
       iteration: nouvellePromo.iteration
@@ -64,19 +31,33 @@ response.status(201).json({
   });
 });
 
-
-router.delete("/supprimer/:id", async(request,response)=>{
+router.delete("/supprimer/:id", async (request, response) => {
   const { id } = request.params;
   await promosController.deletePromo(id);
   response.json()
-      .status(204);
+    .status(204);
 
 });
-router.put("/modifier/:id", async(request, response)=>{
-  const {id}=request.params;
-  const data=request.body;
-  const updateData = await promosController.updatePromo(id,data);
+router.put("/modifier/:id", async (request, response) => {
+  const { id } = request.params;
+  const data = request.body;
+  const updateData = await promosController.updatePromo(id, data);
   response.status(200).json(updateData);
 });
+
+router.post("/:id/apprenants/ajouter", async (request, response) => {
+  const data = request.body;
+  const promoId = request.params.id;
+
+  const nouvelApprenant = await promosController
+    .addApprenantDansPromo(promoId, data);
+
+  response.status(201).json({
+    data: {
+      nom: nouvelApprenant.nom,
+      prenom: nouvelApprenant.prenom
+    }
+  });
+})
 
 module.exports = router;

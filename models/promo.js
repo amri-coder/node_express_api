@@ -1,6 +1,8 @@
 const dataTypes = require("sequelize");
 const db = require("../db");
 
+const Apprenant = require("./apprenant");
+
 const Promo = db.define("promo", {
   id: {
     allowNull: false,
@@ -26,5 +28,10 @@ const Promo = db.define("promo", {
     type: dataTypes.DATE
   }
 });
+
+Promo.associate = () => {
+  Promo.hasMany(Apprenant);
+}
+
 
 module.exports = Promo;

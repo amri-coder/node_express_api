@@ -14,9 +14,16 @@ router.use("/promos", promosRoutes);
 
 router.use("*", (req, res) => {
   res.status(404).json({
-    error: true,
-    message: "FUCK YOU DUMMY"
+    error: "FUCK YOU DUMMY"
   });
 });
+
+// ERROR HANDLER
+// router.use((error, request, response, next) => {
+//   console.error(error.message);
+//   response.status(400).json({
+//     error: error.message
+//   });
+// })
 
 module.exports = router;
